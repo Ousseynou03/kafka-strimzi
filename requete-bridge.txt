@@ -1,0 +1,21 @@
+curl -X POST   http://192.168.1.47:30083/topics/display-line-balance-producer-topic   -H 'Content-Type: application/vnd.kafka.json.v2+json'   -u 'admin:A4Itfn4RS0imwvuZAZCpbqwzBZfj8jlg'   -d '{
+        "records": [
+          {
+            "value": {
+              "IBSubscriber": {
+                "ib_mdn": "123456"
+              },
+              "IBNetworkBalance": [
+                {
+                  "ib_id": "2000"
+                }
+              ],
+              "IBOperation": {
+                "origin": "CVM",
+                "user": "CVM-USER",
+                "uuid": "1687797837362137800"
+              }
+            }
+          }
+        ]
+      }'

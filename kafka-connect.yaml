@@ -1,0 +1,131 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: my-connect
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  replicas: 1
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+  config:
+    group.id: connect-cluster
+    offset.storage.topic: connect-cluster-offsets
+    config.storage.topic: connect-cluster-configs
+    status.storage.topic: connect-cluster-status
+    auto.create.topics.enable: true
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+    config.storage.replication.factor: -1
+    offset.storage.replication.factor: -1
+    status.storage.replication.factor: -1
+  build:
+    output:
+      type: docker
+      image: ttl.sh/strimzi-connect-example-3.7.0:24h
+    plugins:
+      - name: idcrqv1006
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/connectors/IdcRQV1006.zip?inline=false
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/services_config/IdcRQV1006.zip
+      - name: idcrqvtestlm
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/connectors/IdcRQV1006.zip?inline=false
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/services_config/IdcRQV1006.zip
+
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv1006
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV1006"
+  tasksMax: 1
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
+        producer.bootstrap.server: http://192.168.1.47:30985
+        http.soap.template.root: /opt/kafka/plugins/idcrqv1006/a8acb768/
+        topics: display-line-balance-producer-topic
+        tasks.max: 1
+        http.soap.name: IdcRQV1006
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.67:8080/
+        producer.target.topic: display-line-balance-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: QueryCustomerInfo
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: A4Itfn4RS0imwvuZAZCpbqwzBZfj8jlg
+        connector.client.config.override.policy: All
+        login.system.code: RQV1006
+        login.system.password: RQV1006
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MzAxMDY1NDEsImlhdCI6MTcyMjI0NDE0MX0.QAIL7LnwNlJF9cPcswExZFkB_aePfbTuBJZGhIql6aE
+
+
+---
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqvtestlm
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV1006"
+  tasksMax: 1
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
+        producer.bootstrap.server: http://192.168.1.47:30985
+        http.soap.template.root: /opt/kafka/plugins/idcrqv1006/a8acb768/
+        topics: test
+        tasks.max: 1
+        http.soap.name: IdcRQV1006
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.6:8080/
+#        producer.target.topic: test
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: QueryCustomerInfo
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: A4Itfn4RS0imwvuZAZCpbqwzBZfj8jlg
+        connector.client.config.override.policy: All
+        login.system.code: RQV1006
+        login.system.password: RQV1006
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MzAxMDY1NDEsImlhdCI6MTcyMjI0NDE0MX0.QAIL7LnwNlJF9cPcswExZFkB_aePfbTuBJZGhIql6aE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-connect-service
+spec:
+  ports:
+  - name: http
+    port: 8083
+    targetPort: 8083
+  selector:
+    strimzi.io/cluster: my-connect
+  type: NodePort
