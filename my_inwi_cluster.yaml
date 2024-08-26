@@ -1,12 +1,11 @@
-
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
   name: controller
   labels:
-    strimzi.io/cluster: my-cluster
+    strimzi.io/cluster: my-inwi
 spec:
-  replicas: 2
+  replicas: 1
   roles:
     - controller
   storage:
@@ -24,9 +23,9 @@ kind: KafkaNodePool
 metadata:
   name: broker
   labels:
-    strimzi.io/cluster: my-cluster
+    strimzi.io/cluster: my-inwi
 spec:
-  replicas: 2
+  replicas: 1
   roles:
     - broker
   storage:
@@ -46,18 +45,11 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: my-cluster
+  name: my-inwi
   annotations:
     strimzi.io/node-pools: enabled
     strimzi.io/kraft: enabled
 spec:
-  cruiseControl:
-    metricsConfig:
-      type: jmxPrometheusExporter
-      valueFrom:
-        configMapKeyRef:
-          name: cruise-control-metrics
-          key: metrics-config.yml
   kafka:
     version: 3.7.1
     metadataVersion: 3.7-IV4
@@ -86,22 +78,5 @@ spec:
     topicOperator: {}
     userOperator: {}
     
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: cruise-control-metrics
-  labels:
-    app: strimzi
-data:
-  metrics-config.yml: |
-    # See https://github.com/prometheus/jmx_exporter for more info about JMX Prometheus Exporter metrics
-    lowercaseOutputName: true
-    rules:
-    - pattern: kafka.cruisecontrol<name=(.+)><>(\w+)
-      name: kafka_cruisecontrol_$1_$2
-      type: GAUGE
-
     
     
-    #org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="A4Itfn4RS0imwvuZAZCpbqwzBZfj8jlg";  username et password du cluster

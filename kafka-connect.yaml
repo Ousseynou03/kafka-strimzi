@@ -37,6 +37,24 @@ spec:
             url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/connectors/IdcRQV1006.zip?inline=false
           - type: zip
             url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/services_config/IdcRQV1006.zip
+      - name: test1
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/test1/IdcRQV1006/files/connectors/test1.zip?inline=false
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/test1/IdcRQV1006/files/services_config/test1.zip
+      - name: test2
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/test2/IdcRQV1006/files/connectors/test2.zip?inline=false
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/test2/IdcRQV1006/files/services_config/test2.zip
+      - name: test-connect
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/test-connect/IdcRQV1006/files/connectors/test2.zip?inline=false
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/test-connect/IdcRQV1006/files/services_config/test2.zip
 
 
 ---
@@ -52,12 +70,12 @@ spec:
   config:
         connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
         producer.bootstrap.server: http://192.168.1.47:30985
-        http.soap.template.root: /opt/kafka/plugins/idcrqv1006/a8acb768/
+        http.soap.template.root: /opt/kafka/plugins/idcrqv1006/a8acb768/ 
         topics: display-line-balance-producer-topic
         tasks.max: 1
         http.soap.name: IdcRQV1006
         http.headers.content.type: text/xml; charset=utf-8
-        http.url: http://192.168.1.67:8080/
+        http.url: http://192.168.1.19:8080/
         producer.target.topic: display-line-balance-consumer-topic
         producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
         http.api.type: SOAP
@@ -79,11 +97,10 @@ spec:
 
 
 ---
-
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaConnector
 metadata:
-  name: idcrqvtestlm
+  name: test1
   labels:
     strimzi.io/cluster: my-connect
 spec:
@@ -92,13 +109,13 @@ spec:
   config:
         connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
         producer.bootstrap.server: http://192.168.1.47:30985
-        http.soap.template.root: /opt/kafka/plugins/idcrqv1006/a8acb768/
-        topics: test
+        http.soap.template.root: /opt/kafka/plugins/test1/d714962f/
+        topics: display-line-balance-consumer-topic
         tasks.max: 1
-        http.soap.name: IdcRQV1006
+        http.soap.name: test1
         http.headers.content.type: text/xml; charset=utf-8
-        http.url: http://192.168.1.6:8080/
-#        producer.target.topic: test
+        http.url: http://192.168.1.19:8080/
+        producer.target.topic: test1
         producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
         http.api.type: SOAP
         key.converter.schemas.enable: false
@@ -116,6 +133,83 @@ spec:
         login.system.code: RQV1006
         login.system.password: RQV1006
         system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MzAxMDY1NDEsImlhdCI6MTcyMjI0NDE0MX0.QAIL7LnwNlJF9cPcswExZFkB_aePfbTuBJZGhIql6aE
+
+#---
+#apiVersion: kafka.strimzi.io/v1beta2
+#kind: KafkaConnector
+#metadata:
+#  name: test2
+#  labels:
+#    strimzi.io/cluster: my-connect
+#spec:
+#  class: "io.indatacore.kafka.connect.http.IdcRQV1006"
+#  tasksMax: 1
+#  config:
+#        connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
+#        producer.bootstrap.server: http://192.168.1.47:30985
+#        http.soap.template.root: /opt/kafka/plugins/test2/05ab7dee/
+#        topics: test2
+#        tasks.max: 1
+#        http.soap.name: test2
+#        http.headers.content.type: text/xml; charset=utf-8
+#        http.url: http://192.168.1.67:8080/
+#        producer.target.topic: test3
+#        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+#        http.api.type: SOAP
+#        key.converter.schemas.enable: false
+#        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+#        value.converter.schemas.enable: false
+#        errors.tolerance: all
+#        value.converter: org.apache.kafka.connect.storage.StringConverter
+#        key.converter: org.apache.kafka.connect.storage.StringConverter
+#        http.action: QueryCustomerInfo
+#        schemas.enable: false
+#        producer.sasl.enabled: true
+#        producer.sasl.username: admin
+#        producer.sasl.password: A4Itfn4RS0imwvuZAZCpbqwzBZfj8jlg
+#        connector.client.config.override.policy: All
+#        login.system.code: RQV1006
+#        login.system.password: RQV1006
+#        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MzAxMDY1NDEsImlhdCI6MTcyMjI0NDE0MX0.QAIL7LnwNlJF9cPcswExZFkB_aePfbTuBJZGhIql6aE
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: test-connect
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV1006"
+  tasksMax: 1
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
+        producer.bootstrap.server: http://192.168.1.47:30985
+        http.soap.template.root: /opt/kafka/plugins/test-connect/6ba2d8dd/
+        topics: test1
+        tasks.max: 1
+        http.soap.name: test1
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.11.113:8080/
+        producer.target.topic: test2
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: QueryCustomerInfo
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: A4Itfn4RS0imwvuZAZCpbqwzBZfj8jlg
+        connector.client.config.override.policy: All
+        login.system.code: RQV1006
+        login.system.password: RQV1006
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MzAxMDY1NDEsImlhdCI6MTcyMjI0NDE0MX0.QAIL7LnwNlJF9cPcswExZFkB_aePfbTuBJZGhIql6aE
+
 ---
 apiVersion: v1
 kind: Service
